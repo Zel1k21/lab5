@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iomanip>
+#include <cstring>
 
 const int MAX_SIZE = 5;
 
@@ -15,15 +16,17 @@ protected:
 	void resize();
 public:
 	MyVector() : inf(nullptr), maxSize(MAX_SIZE), currentSize(0) {};
-	MyVector(MyVector&);
+	MyVector(const MyVector&);
 	~MyVector() { delete[] inf; }
 	void addElement(Information);
 	void deleteElement(int);
-	Information operator [] (int i);
+	Information& operator [] (int i);
 	void sort();
+	bool isElement(Information);
 	int getSize() { return currentSize; }
 	int getMaxSize() { return maxSize; }
 	int find(Information);
+	//int find(char*);
 	MyVector<Information>& operator = (MyVector<Information>&);
 	template<class U>
 	friend std::ostream& operator <<(std::ostream&,const MyVector<U>&);
@@ -44,7 +47,7 @@ inline void MyVector<Information>::resize()
 }
 
 template<class Information>
-inline MyVector<Information>::MyVector(MyVector& other)
+inline MyVector<Information>::MyVector(const MyVector& other)
 {
 	maxSize = MAX_SIZE;
 	currentSize = other.currentSize;
@@ -65,6 +68,8 @@ inline void MyVector<Information>::addElement(Information elem)
 template<class Information>
 inline void MyVector<Information>::deleteElement(int ignore)
 {
+	if (ignore < 0 || ignore > currentSize)
+		return;
 	for (int i = ignore; i < currentSize - 1; i++)
 		inf[i] = inf[i + 1];
 	resize();
@@ -72,7 +77,7 @@ inline void MyVector<Information>::deleteElement(int ignore)
 }
 
 template<class Information>
-inline Information MyVector<Information>::operator[](int i)
+inline Information& MyVector<Information>::operator[](int i)
 {
 	return *(inf + i);
 }
@@ -94,6 +99,16 @@ inline int MyVector<Information>::find(Information element)
 			return i + 1;
 	return -1;
 }
+
+template<>
+inline int MyVector<char*>::find(char* elem)
+{
+	for (int i = 0; i < currentSize; i++)
+		if (strncmp(inf[i], elem, sizeof(elem)) == 0)
+			return i + 1;
+	return -1;
+}
+
 
 template<class Information>
 inline MyVector<Information>& MyVector<Information>::operator=(MyVector<Information>& source)
@@ -117,4 +132,12 @@ inline std::ostream& operator<<(std::ostream& out, const MyVector<U>& el)
 	out << el.inf[el.currentSize - 1];
 	out << '}';
 	return out;
+}
+
+template<class Information>
+inline bool MyVector<Information>::isElement(Information el)
+{
+	if (this->find(el) != -1)
+		return true;
+	return false;
 }

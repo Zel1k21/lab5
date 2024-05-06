@@ -9,11 +9,14 @@ public:
 	MySet& operator += (MySet&);
 	MySet& operator -= (MySet&);
 	MySet& operator *= (MySet&);
+	
+	void addElement(Information);
+	void delete_Element(Information);
 
 	template <class U> 
 	friend MySet<U> operator+(MySet<U>&, MySet<U>&);
 	template <class U>
-	friend MySet<U> operator-(MySet<U>&, MySet<U>&);
+	friend MySet<U> operator-(MySet<U>&, const MySet<U>&);
 	template <class U>
 	friend MySet<U> operator*(MySet<U>&, MySet<U>&);
 };
@@ -49,11 +52,11 @@ inline MySet<Information>& MySet<Information>::operator+=(MySet<Information>& so
 }
 
 template<class U>
-inline MySet<U> operator-(MySet<U>& lhs, MySet<U>& rhs)
+inline MySet<U> operator-( MySet<U>& lhs, const MySet<U>& rhs)
 {
 	MySet<U> result = lhs;
 	for (int i = 0; i < rhs.currentSize; i++)
-		if (result.find(rhs.inf[i]) != -1)
+		if (result.isElement(rhs.inf[i]))
 			result.deleteElement(result.find(rhs.inf[i]) - 1);
 	return result;
 }
@@ -80,4 +83,19 @@ inline MySet<Information>& MySet<Information>::operator*=(MySet<Information>& so
 {
 	*this = *this * source;
 	return *this;
+}
+
+template<class Information>
+inline void MySet<Information>::addElement(Information el)
+{
+	if (!this->isElement(el)) {
+		MyVector::addElement(el);
+	}
+}
+
+template<class Information>
+inline void MySet<Information>::delete_Element(Information el)
+{
+	if (this->isElement(el))
+		MyVector::deleteElement(this->find(el));
 }
